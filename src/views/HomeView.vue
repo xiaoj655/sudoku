@@ -10,10 +10,13 @@ let data = ref(),
   result = ref([]),
   solvingResult = ref("");
 
+let idx = 0;
 function init() {
   solvingMode.value = 0;
-  const idx = Math.floor(Math.random() * sudoku_data.length);
+  // const idx = Math.floor(Math.random() * sudoku_data.length);
   const d = sudoku_data[idx];
+  idx += 1
+  idx %= sudoku_data.length;
   data.value = d.value;
   layout.value = d.layout;
 }
@@ -39,8 +42,19 @@ function test() {
   );
   c = Array.from({ length: 9 }, (_, i) => c.slice(i * 9, i * 9 + 9));
   data.value = c;
+  // const _c = [
+  //     [".", ".", ".",".",".",".",".", ".", "."],
+  //     [".", "5", "8", ".", ".", ".", ".", "4", "."],
+  //     ["7", ".", ".", "8", ".", ".", ".", ".", "1", "."],
+  //     [".",".", "9", ".","2", ".",".",".",".",],
+  //     [".", "1", ".","4", ".","6", ".", "3", "."],
+  //     [".", ".", ".", ".", "4", ".", "1", ".","."],
+  //     [".", "2", ".", ".", ".", "1",  ".", ".", "7"],
+  //     [".", "3", ".", ".", ".", ".", "7", "9", "."],
+  //     [ ".", ".", ".", ".", ".", ".", ".", ".", "."]
+  //   ]
   result.value.length = 0;
-  worker.postMessage(c);
+  worker.postMessage({data: c, layout: JSON.parse(JSON.stringify(layout.value))});
   solvingResult.value = "开始递归计算";
 
   worker.onmessage = (e) => {

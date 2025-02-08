@@ -1,7 +1,8 @@
 const ret = [];
+let layout, layoutMap;
 onmessage = function (event) {
-  const data = event.data;
-  sudoku(data);
+  const {data, layout} = event.data;
+  sudoku(data, layout);
   this.postMessage(-1);
 };
 
@@ -12,13 +13,13 @@ function isValid(row, col, val, board) {
     }
   }
 
-  const startRow = Math.floor(row / 3) * 3;
-  const startCol = Math.floor(col / 3) * 3;
-  for (let i = startRow; i < startRow + 3; i++) {
-    for (let j = startCol; j < startCol + 3; j++) {
-      if (board[i][j] === val) return false;
-    }
+  const k = layout[row][col]
+  const points = layoutMap[k]
+  for (let i = 0; i < points.length; i++) {
+    const [x, y] = points[i]
+    if (board[x][y] === val) return false;
   }
+
   return true;
 }
 
@@ -45,8 +46,19 @@ function backtracking(board) {
   return true;
 }
 
-function sudoku(board) {
+function sudoku(board, _layout) {
   ret.length = 0;
+  layoutMap = {}
+  layout = _layout
+
+  for(let i=0;i<_layout.length;i++){
+    for(let j=0;j<_layout.length;j++){
+      const k = _layout[i][j]
+      if (!layoutMap[k]) layoutMap[k] = []
+      layoutMap[k].push([i, j])
+    }
+  }
+
   backtracking(board);
   return ret;
 }
